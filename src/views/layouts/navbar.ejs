@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navbar</title>
+    <!-- Importando Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- Importando iconos de Materialize -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+         nav.nav-wrapper.white {
+            background-color: white !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+        nav.nav-wrapper.white .brand-logo {
+            color: teal !important;
+            margin-left: 20px;
+            margin-right: 1000px;
+        }
+        nav.nav-wrapper.white .teal-text {
+            color: teal !important;
+        }
+        .white-text {
+            color: white !important;
+        }
+        body {
+            padding-top: 64px;
+            margin: 0;
+        }
+        nav.nav-wrapper.white .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .circle-teal {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            background-color: teal;
+            color: white;
+            font-size: 18px;
+            margin-right: 8px;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            margin-left: auto; 
+        }
+        .nav-links li {
+            margin-left: 10px;
+        }
+        .center-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-wrapper white">
+        <div class="container">
+            <a href="/todospanel/home" class="brand-logo teal-text">TAREAS</a>
+            <ul class="nav-links hide-on-med-and-down">
+                <% if (user) { %>
+                    <li><a href="/todospanel" class="teal-text">ADMINISTRAR TAREAS</a></li>
+                    <li><a href="/recetas" class="teal-text">ADMINISTRAR RECETAS</a></li>
+                <% } %>
+            </ul>
+            <ul class="right hide-on-med-and-down">
+                <% if (!user) { %>
+                    <li><a href="/auth/signIn" class="btn waves-effect waves-light teal lighten-2 white-text">Login</a></li>
+                    <li><a href="/auth/signUp" class="btn waves-effect waves-light teal white-text">Registro</a></li>
+                <% } else { %>
+                    <li>
+                        <a class="dropdown-trigger btn waves-effect waves-light teal lighten-2 white-text" href="#!" data-target="dropdown1">
+                            <span class="circle-teal">
+                                <%= user.name.charAt(0).toUpperCase() %>
+                            </span>
+                            <%= user.name %>
+                            <i class="material-icons right">arrow_drop_down</i>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </nav>
+
+    <ul id="dropdown1" class="dropdown-content">
+        <li><a href="/auth/profile">Perfil</a></li>
+        <li class="divider"></li>
+        <li><a href="/auth/signOut">Cerrar sesión</a></li>
+    </ul>
+
+    <!-- Importando Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.dropdown-trigger');
+            var instances = M.Dropdown.init(elems);
+        });
+    </script>
+</body>
+</html>

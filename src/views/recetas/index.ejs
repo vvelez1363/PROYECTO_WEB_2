@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recetas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .receta-body {
+            padding: 20px;
+            background: url('/images/gastronomia.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+        .receta-container {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto; 
+        }
+        .receta-container h1, .receta-container h2 {
+            color: black;
+        }
+        .receta-collection-item {
+            background: rgba(255, 255, 255);
+            color: black;
+            font-size: 1.2rem;
+            border: none;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+        .receta-collection-item input[type="text"],
+        .receta-collection-item label,
+        .receta-collection-item .switch label {
+            color: black;
+            font-size: 1.2rem;
+        }
+        .receta-add-form {
+            background: rgb(255, 255, 255);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .receta-add-form label, .receta-add-form input[type="text"], .receta-add-form textarea {
+            color: black;
+            font-size: 1.2rem;
+        }
+        .receta-modal-content, .receta-modal-footer {
+            color: black;
+            font-size: 1.2rem;
+        }
+        .modal-content {
+            color: black; 
+        }
+        #confirmDelete {
+            background-color: teal;
+            color: white;
+        }
+    </style>
+</head>
+<body class="receta-body">
+    <div class="receta-container">
+        <h1 class="center-align">Recetas</h1>
+        <form action="/recetas" method="POST" class="receta-add-form">
+            <div class="input-field">
+                <input type="text" id="nombre" name="nombre" required>
+                <label for="nombre">Nombre:</label>
+            </div>
+            <div class="input-field">
+                <textarea id="descripcion" name="descripcion" class="materialize-textarea"></textarea>
+                <label for="descripcion">Descripción:</label>
+            </div>
+            <div class="input-field">
+                <input type="number" id="tiempo_preparacion" name="tiempo_preparacion">
+                <label for="tiempo_preparacion">Tiempo de preparación (minutos):</label>
+            </div>
+            <div class="input-field">
+                <select id="dificultad" name="dificultad">
+                    <option value="" disabled selected></option>
+                    <option value="Fácil">Fácil</option>
+                    <option value="Moderada">Moderada</option>
+                    <option value="Difícil">Difícil</option>
+                </select>
+                <label for="dificultad">Dificultad:</label>
+            </div>
+            <button type="submit" class="btn">Agregar Receta</button>
+        </form>
+
+        <h2 class="center-align">Lista de Recetas</h2>
+        <ul class="collection">
+            <% recetas.forEach((receta) => { %>
+                <li class="collection-item receta-collection-item" id="receta_<%= receta.id %>">
+                    <div class="row">
+                        <div class="col s12">
+                            <form id="updateForm_<%= receta.id %>" class="d-inline">
+                                <div class="input-field col s12">
+                                    <input type="text" name="nombre" value="<%= receta.nombre %>">
+                                    <label class="active">Nombre:</label>
+                                </div>
+                                <div class="input-field col s12">
+                                    <textarea name="descripcion" class="materialize-textarea"><%= receta.descripcion %></textarea>
+                                    <label class="active">Descripción:</label>
+                                </div>
+                                <div class="input-field col s6">
+                                    <input type="number" name="tiempo_preparacion" value="<%= receta.tiempo_preparacion %>">
+                                    <label class="active">Tiempo de preparación (minutos):</label>
+                                </div>
+                                <div class="input-field col s6">
+                                    <select name="dificultad">
+                                        <option value="Fácil" <%= receta.dificultad === 'Fácil' ? 'selected' : '' %>>Fácil</option>
+                                        <option value="Moderada" <%= receta.dificultad === 'Moderada' ? 'selected' : '' %>>Moderada</option>
+                                        <option value="Difícil" <%= receta.dificultad === 'Difícil' ? 'selected' : '' %>>Difícil</option>
+                                    </select>
+                                    <label class="active">Dificultad:</label>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="right-align">
+                        <button type="button" onclick="updateReceta('<%= receta.id %>')" class="btn-small waves-effect waves-light green">
+                            <i class="material-icons">autorenew</i>
+                        </button>
+                        <button type="button" onclick="openDeleteModal('<%= receta.id %>')" class="btn-small waves-effect waves-light red">
+                            <i class="material-icons">delete</i>
+                        </button>
+                    </div>
+                </li>
+            <% }) %>
+        </ul>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h4>Eliminar Receta</h4>
+            <p>¿Estás seguro de que deseas eliminar esta receta?</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" id="confirmDelete" class="modal-close waves-effect waves-green btn-flat">Aceptar</a>
+            <a href="#!" class="modal-close waves-effect waves-red btn-flat">Cancelar</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.modal');
+            M.Modal.init(elems);
+            var selectElems = document.querySelectorAll('select');
+            M.FormSelect.init(selectElems);
+        });
+
+        let recetaIdToDelete = null;
+
+        function updateReceta(recetaId) {
+            var formData = $('#updateForm_' + recetaId).serialize();
+
+            $.ajax({
+                type: 'POST',
+                url: '/recetas/' + recetaId,
+                data: formData,
+                success: function(response) {
+                    M.toast({html: 'Receta actualizada', classes: 'green'});
+                },
+                error: function(err) {
+                    M.toast({html: 'Error al actualizar la receta', classes: 'red'});
+                }
+            });
+        }
+
+        function openDeleteModal(recetaId) {
+            recetaIdToDelete = recetaId;
+            const instance = M.Modal.getInstance(document.getElementById('deleteModal'));
+            instance.open();
+        }
+
+        $('#confirmDelete').click(function() {
+            $.ajax({
+                type: 'DELETE',
+                url: '/recetas/' + recetaIdToDelete,
+                success: function(response) {
+                    M.toast({html: 'Receta eliminada', classes: 'green'});
+                    $('#receta_' + recetaIdToDelete).remove();
+                },
+                error: function(err) {
+                    M.toast({html: 'Error al eliminar la receta', classes: 'red'});
+                }
+            });
+        });
+    </script>
+</body>
+</html>
